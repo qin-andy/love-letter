@@ -7,6 +7,7 @@ public class GameController : MonoBehaviour
     // Start is called before the first frame update
     public GameObject Tile;
     public GameObject SelectorObj;
+    public GameObject UnitObj;
     public Selector MainSelector;
     public List<TileState> Tiles;
 
@@ -32,6 +33,21 @@ public class GameController : MonoBehaviour
         GameObject SingleSelectorObj = Instantiate(SelectorObj, Vector3.zero, Quaternion.identity);
         MainSelector = SingleSelectorObj.GetComponent<Selector>();
         MainSelector.Game = this;
+
+
+        GameObject EgUnitObj = Instantiate(UnitObj, Vector3.zero, Quaternion.identity);
+        UnitState EgUnitState = EgUnitObj.GetComponent<UnitState>();
+        EgUnitState.Game = this;
+
+        GameObject EgUnitObj2 = Instantiate(UnitObj, Vector3.zero, Quaternion.identity);
+        UnitState EgUnitState2 = EgUnitObj2.GetComponent<UnitState>();
+        EgUnitState2.Game = this;
+
+        TileState RandTile = Tiles[Random.Range(0, Tiles.Count)];
+        EgUnitState.MoveToTile(RandTile);
+
+        RandTile = Tiles[Random.Range(0, Tiles.Count)];
+        EgUnitState2.MoveToTile(RandTile);
     }
 
     public TileState GetTileAt(Vector2Int coord)

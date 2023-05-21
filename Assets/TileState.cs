@@ -8,6 +8,8 @@ public class TileState : MonoBehaviour
     public GameController Game;
     public Vector2Int Coord;
     public Color PrevColor;
+
+    public UnitState Unit;
     // Start is called before the first frame update
     void Start()
     {
@@ -22,6 +24,11 @@ public class TileState : MonoBehaviour
     }
 
 
+    void OnMouseDown()
+    {
+        
+    }
+    
     void OnMouseEnter()
     {
         PrevColor = GetComponent<Renderer>().material.color;
