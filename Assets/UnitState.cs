@@ -6,16 +6,21 @@ public class UnitState : MonoBehaviour
 {
     public GameController Game;
     public TileState Tile;
+
+    public int Movement;
+
+    float HoverHeight = 0.5f;
+
     // Start is called before the first frame update
     void Start()
     {
-        
+        Movement = 6;
     }
-    
+
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
     void OnMouseDown()
@@ -27,13 +32,37 @@ public class UnitState : MonoBehaviour
     {
         if (Tile != null)
         {
-            Tile.Unit = null;
+            Tile.CurrentUnit = null;
         }
-        float HoverHeight = 0.5f;
         this.transform.position = targetTile.transform.position + new Vector3(0f, HoverHeight, 0f);
         Tile = targetTile;
-        Tile.Unit = this;
+        Tile.CurrentUnit = this;
+    }
 
+    public void MoveAlongPath(List<TileState> path, SelectorState endState)
+    {
+        Game.MainSelector.State = SelectorState.Moving;
+
+        Tile.CurrentUnit = null;
+        Tile = path[path.Count - 1];
+        Tile.CurrentUnit = this;
+        StartCoroutine(MoveAlongPathCoroutine(path, endState));
+    }
+
+    IEnumerator MoveAlongPathCoroutine(List<TileState> path, SelectorState endState)
+    {
+        for (int node = 0; node < path.Count; node++)
+        {
+            Vector3 origin = transform.position;
+            Vector3 dest = path[node].transform.position + new Vector3(0f, HoverHeight, 0f);
+            for (float i = 0; i < 1f; i += 0.03f)
+            {
+                Vector3 currLoc = (i * dest) + ((1 - i) * origin);
+                transform.position = currLoc;
+                yield return null;
+            }
+        }
+        Game.MainSelector.State = endState;
     }
 
 }

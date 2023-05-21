@@ -4,8 +4,9 @@ using UnityEngine;
 
 public enum SelectorState {
     UnitSelection,
-    UnitMovement,
-    CombatTargetSelection
+    UnitMovementSelection,
+    Moving,
+    PostMoving,
 }
 
 public class Selector : MonoBehaviour
@@ -13,14 +14,20 @@ public class Selector : MonoBehaviour
     // Start is called before the first frame update
     public GameController Game;
     public SelectorState State;
-    public UnitState CurrentUnit;
-    public TileState CurrentTile;
+    public UnitState SelectedUnit;
+    public TileState SelectedTile;
+
+    public int UsedMoves;
 
     public float HoverHeight;
+
+    public List<TileState> MovePath;
     void Start()
     {
         HoverHeight = 0.5f;
         State = SelectorState.UnitSelection;
+        MovePath = new List<TileState>();
+        UsedMoves = 0;
     }
 
     // Update is called once per frame
@@ -32,21 +39,30 @@ public class Selector : MonoBehaviour
     public void HoverSelectTile(TileState targetTile)
     {
         this.transform.position = targetTile.transform.position + new Vector3(0f, HoverHeight, 0f);
-        CurrentTile = targetTile;
+        SelectedTile = targetTile;
     }
 
     public void SelectUnit(UnitState unit)
     {
-        if (CurrentUnit != null)
+        if (State == SelectorState.UnitSelection)
         {
-            DeselectUnit();
+            if (SelectedUnit != null)
+            {
+                DeselectAll();
+                State = SelectorState.UnitSelection;
+            }
+            unit.transform.localScale *= 1.3f;
+            SelectedUnit = unit;
+            UsedMoves = 0;
+            State = SelectorState.UnitMovementSelection;
+            unit.Tile.AddToPath();
         }
-        CurrentUnit = unit;
-        unit.transform.localScale *= 2f;
     }
 
-    public void DeselectUnit()
+    public void DeselectAll()
     {
-        CurrentUnit.transform.localScale *= 0.5f;
+        SelectedUnit.transform.localScale /= 1.3f;
+        SelectedUnit = null;
+        UsedMoves = 0;
     }
 }
