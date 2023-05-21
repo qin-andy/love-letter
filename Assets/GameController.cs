@@ -8,16 +8,20 @@ public class GameController : MonoBehaviour
     public GameObject Tile;
     public GameObject SelectorObj;
     public GameObject UnitObj;
+    public GameObject UnitDisplayObj;
+    public GameObject Canvas;
+
     public Selector MainSelector;
     public List<TileState> Tiles;
+    public CombatController MainCombatController;
 
     void Start()
     {
         // Place all tiles
         List<Vector2Int> Coords = new List<Vector2Int>();
-        for (int i = 0; i < 25; i++)
+        for (int i = 0; i < 100; i++)
         {
-            Coords.Add(new Vector2Int(i % 5, i / 5));
+            Coords.Add(new Vector2Int(i % 10, i / 10));
         }
         foreach (Vector2Int Coord in Coords)
         {
@@ -48,6 +52,22 @@ public class GameController : MonoBehaviour
 
         RandTile = Tiles[Random.Range(0, Tiles.Count)];
         EgUnitState2.MoveToTile(RandTile);
+
+        GameObject UnitDisplay1Obj = Instantiate(UnitDisplayObj);
+        UnitDisplay1Obj.transform.SetParent(Canvas.transform);
+        UnitDisplay1Obj.GetComponent<RectTransform>().localPosition = new Vector3(-400f, 250f, 0f);
+
+        UnitDisplayState UnitDisplay1 = UnitDisplay1Obj.GetComponent<UnitDisplayState>();
+        UnitDisplay1.Unit = EgUnitState;
+
+        GameObject UnitDisplay2Obj = Instantiate(UnitDisplayObj);
+        UnitDisplay2Obj.transform.SetParent(Canvas.transform);
+        UnitDisplay2Obj.GetComponent<RectTransform>().localPosition = new Vector3(400f, 250f, 0f);
+
+        UnitDisplayState UnitDisplay2 = UnitDisplay2Obj.GetComponent<UnitDisplayState>();
+        UnitDisplay2.Unit = EgUnitState2;
+
+        MainCombatController = gameObject.AddComponent<CombatController>();
     }
 
     public TileState GetTileAt(Vector2Int coord)

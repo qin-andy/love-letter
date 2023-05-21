@@ -32,23 +32,30 @@ public class TileState : MonoBehaviour
     {
         if (Game.MainSelector.State == SelectorState.UnitSelection && CurrentUnit != null)
         {
-            SelectUnhighlight();
+            /**
+                Clicked on a tile functionality:
+                1. Hover unhighlight
+                2. Select the unit on current tile
+            */
+            HoverUnhighlight();
             Game.MainSelector.SelectUnit(CurrentUnit);
         }
         else if (Game.MainSelector.State == SelectorState.UnitMovementSelection && ValidMoveTarget())
         {
-            // Game.MainSelector.SelectedUnit.MoveToTile(this);
             List<TileState> pathClone = new List<TileState>(Game.MainSelector.MovePath);
-            Game.MainSelector.SelectedUnit.MoveAlongPath(pathClone, SelectorState.UnitSelection);
-            foreach (TileState tile in Game.MainSelector.MovePath)
-            {
-                tile.PathUnhighlight();
-            }
-            Game.MainSelector.MovePath.Clear();
-            Game.MainSelector.UsedMoves = 0;
-            Game.MainSelector.DeselectAll();
-            // Game.MainSelector.State = SelectorState.UnitSelection;
 
+            // MainSelector state is handled in hte Move Along Path coroutine
+            Game.MainSelector.SelectedUnit.MoveAlongPath(pathClone, SelectorState.UnitSelection);
+
+            Game.MainSelector.ClearMovement();
+        }
+        else if (Game.MainSelector.State == SelectorState.UnitMovementSelection && ValidAttackTarget())
+        {
+            Debug.Log("Arranging combat!");
+            List<TileState> pathClone = new List<TileState>(Game.MainSelector.MovePath);
+            Game.MainCombatController.DoCombat(Game.MainSelector.SelectedUnit, CurrentUnit);
+            Game.MainSelector.SelectedUnit.MoveAlongPath(pathClone, SelectorState.UnitSelection);
+            Game.MainSelector.ClearMovement();
         }
         // else if (Game.MainSelector.State == SelectorState.PostMoving)
         // {
@@ -82,19 +89,36 @@ public class TileState : MonoBehaviour
 
         if (Game.MainSelector.State == SelectorState.UnitSelection)
         {
-            SelectHighlight();
+            HoverHighlight();
         }
-        else if (Game.MainSelector.State == SelectorState.UnitMovementSelection)
+        else if (CurrentUnit == null && Game.MainSelector.State == SelectorState.UnitMovementSelection)
         {
             TryAddingSelfToPath();
         }
+        else if (CurrentUnit != null 
+                    && CurrentUnit != Game.MainSelector.SelectedUnit
+                    && Game.MainSelector.State == SelectorState.UnitMovementSelection)
+        {
+            // Enemy highlighting
+            GetComponent<Renderer>().material.SetColor("_Color", Color.magenta);
+
+
+        }
+        
 
     }
     void OnMouseExit()
     {
         if (Game.MainSelector.State == SelectorState.UnitSelection)
         {
-            SelectUnhighlight();
+            HoverUnhighlight();
+        }
+        else if (CurrentUnit != null 
+                    && CurrentUnit != Game.MainSelector.SelectedUnit
+                    && Game.MainSelector.State == SelectorState.UnitMovementSelection)
+        {
+            // Enemy highlighting
+            GetComponent<Renderer>().material.SetColor("_Color", PrevColor);
         }
     }
 
@@ -154,13 +178,21 @@ public class TileState : MonoBehaviour
             && CurrentUnit == null;
     }
 
-    void SelectHighlight()
+    bool ValidAttackTarget()
+    {
+        TileState Top = Game.MainSelector.MovePath[Game.MainSelector.MovePath.Count - 1];
+        bool InRange = (Top.Coord - Coord).magnitude == 1;
+        return CurrentUnit != null
+            && InRange;
+    }
+
+    void HoverHighlight()
     {
         GetComponent<Renderer>().material.SetColor("_Color", Color.gray);
         SelectHighlighted = true;
     }
 
-    void SelectUnhighlight()
+    void HoverUnhighlight()
     {
         GetComponent<Renderer>().material.SetColor("_Color", PrevColor);
         SelectHighlighted = false;
@@ -176,7 +208,7 @@ public class TileState : MonoBehaviour
         PathHighlighted = true;
     }
 
-    void PathUnhighlight()
+    public void PathUnhighlight()
     {
         StopAllCoroutines();
         StartCoroutine(PathUnhighlightCoroutine());

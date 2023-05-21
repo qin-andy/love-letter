@@ -65,4 +65,15 @@ public class Selector : MonoBehaviour
         SelectedUnit = null;
         UsedMoves = 0;
     }
+
+    public void ClearMovement()
+    {
+        foreach (TileState tile in Game.MainSelector.MovePath)
+        {
+            tile.PathUnhighlight();
+        }
+        MovePath.Clear();
+        UsedMoves = 0;
+        DeselectAll();
+    }
 }

@@ -10,11 +10,15 @@ public class UnitState : MonoBehaviour
     public int Movement;
 
     float HoverHeight = 0.5f;
+    public float Health;
+    public float AttackPower;
 
     // Start is called before the first frame update
     void Start()
     {
         Movement = 6;
+        Health = 10f;
+        AttackPower = 5;
     }
 
     // Update is called once per frame
