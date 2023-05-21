@@ -5,19 +5,14 @@ using UnityEngine;
 
 public class TileState : MonoBehaviour
 {
-    public Vector2Int coord;
-    public Color previousColor;
+    public GameController Game;
+    public Vector2Int Coord;
+    public Color PrevColor;
     // Start is called before the first frame update
     void Start()
     {
-        // Subscribe to events
-        GetComponent<EventManager>().OnPrimaryClicked += OnClicked;
-        GetComponent<EventManager>().OnMouseHoverEnter += OnHoverEnter;
-        GetComponent<EventManager>().OnMouseHoverLeave += OnHoverLeave;
-
-
         // Defaulting color
-        previousColor = GetComponent<Renderer>().material.color;
+        PrevColor = GetComponent<Renderer>().material.color;
     }
 
     // Update is called once per frame
@@ -27,19 +22,17 @@ public class TileState : MonoBehaviour
     }
 
 
-    void OnClicked(System.Object sender, EventArgs e)
+    void OnMouseEnter()
     {
-
-    }
-
-    void OnHoverEnter(System.Object sender, EventArgs e)
-    {
-        previousColor = GetComponent<Renderer>().material.color;
+        PrevColor = GetComponent<Renderer>().material.color;
         GetComponent<Renderer>().material.SetColor("_Color", Color.gray);
-        Debug.Log("Tile at " + coord + " highlighted");
+        Debug.Log("Tile at " + Coord + " highlighted");
+
+        Game.MainSelector.HoverSelectTile(this);
     }
-    void OnHoverLeave(System.Object sender, EventArgs e)
+    void OnMouseExit()
     {
-        GetComponent<Renderer>().material.SetColor("_Color", previousColor);
+        GetComponent<Renderer>().material.SetColor("_Color", PrevColor);
     }
+
 }
