@@ -6,6 +6,7 @@ using UnityEngine;
 public class TileState : MonoBehaviour
 {
     public GameController Game;
+    public MapController MapController;
     public Vector2Int Coord;
     public Color PrevColor;
 
@@ -30,7 +31,7 @@ public class TileState : MonoBehaviour
 
     void OnMouseDown()
     {
-        if (Game.MainSelector.State == SelectorState.UnitSelection && CurrentUnit != null)
+        if (Game.Selector.State == SelectorPhase.UnitSelection && CurrentUnit != null)
         {
             /**
                 Clicked on a tile functionality:
@@ -38,24 +39,24 @@ public class TileState : MonoBehaviour
                 2. Select the unit on current tile
             */
             HoverUnhighlight();
-            Game.MainSelector.SelectUnit(CurrentUnit);
+            Game.Selector.SelectUnit(CurrentUnit);
         }
-        else if (Game.MainSelector.State == SelectorState.UnitMovementSelection && ValidMoveTarget())
+        else if (Game.Selector.State == SelectorPhase.UnitMovementSelection && ValidMoveTarget())
         {
-            List<TileState> pathClone = new List<TileState>(Game.MainSelector.MovePath);
+            List<TileState> pathClone = new List<TileState>(Game.Selector.MovePath);
 
             // MainSelector state is handled in hte Move Along Path coroutine
-            Game.MainSelector.SelectedUnit.MoveAlongPath(pathClone, SelectorState.UnitSelection);
+            Game.Selector.SelectedUnit.MoveAlongPath(pathClone, SelectorPhase.UnitSelection);
 
-            Game.MainSelector.ClearMovement();
+            Game.Selector.ClearMovement();
         }
-        else if (Game.MainSelector.State == SelectorState.UnitMovementSelection && ValidAttackTarget())
+        else if (Game.Selector.State == SelectorPhase.UnitMovementSelection && ValidAttackTarget())
         {
             Debug.Log("Arranging combat!");
-            List<TileState> pathClone = new List<TileState>(Game.MainSelector.MovePath);
-            Game.MainCombatController.DoCombat(Game.MainSelector.SelectedUnit, CurrentUnit);
-            Game.MainSelector.SelectedUnit.MoveAlongPath(pathClone, SelectorState.UnitSelection);
-            Game.MainSelector.ClearMovement();
+            List<TileState> pathClone = new List<TileState>(Game.Selector.MovePath);
+            Game.CombatController.DoCombat(Game.Selector.SelectedUnit, CurrentUnit);
+            Game.Selector.SelectedUnit.MoveAlongPath(pathClone, SelectorPhase.UnitSelection);
+            Game.Selector.ClearMovement();
         }
         // else if (Game.MainSelector.State == SelectorState.PostMoving)
         // {
@@ -85,37 +86,36 @@ public class TileState : MonoBehaviour
 
     void OnMouseEnter()
     {
-        Game.MainSelector.HoverSelectTile(this);
+        Game.Selector.HoverSelectTile(this);
 
-        if (Game.MainSelector.State == SelectorState.UnitSelection)
+        if (Game.Selector.State == SelectorPhase.UnitSelection)
         {
             HoverHighlight();
         }
-        else if (CurrentUnit == null && Game.MainSelector.State == SelectorState.UnitMovementSelection)
+        else if ((CurrentUnit == null || CurrentUnit == Game.Selector.SelectedUnit)
+                    && Game.Selector.State == SelectorPhase.UnitMovementSelection)
         {
             TryAddingSelfToPath();
         }
         else if (CurrentUnit != null 
-                    && CurrentUnit != Game.MainSelector.SelectedUnit
-                    && Game.MainSelector.State == SelectorState.UnitMovementSelection)
+                    && CurrentUnit != Game.Selector.SelectedUnit
+                    && Game.Selector.State == SelectorPhase.UnitMovementSelection)
         {
             // Enemy highlighting
             GetComponent<Renderer>().material.SetColor("_Color", Color.magenta);
-
-
         }
-        
+
 
     }
     void OnMouseExit()
     {
-        if (Game.MainSelector.State == SelectorState.UnitSelection)
+        if (Game.Selector.State == SelectorPhase.UnitSelection)
         {
             HoverUnhighlight();
         }
         else if (CurrentUnit != null 
-                    && CurrentUnit != Game.MainSelector.SelectedUnit
-                    && Game.MainSelector.State == SelectorState.UnitMovementSelection)
+                    && CurrentUnit != Game.Selector.SelectedUnit
+                    && Game.Selector.State == SelectorPhase.UnitMovementSelection)
         {
             // Enemy highlighting
             GetComponent<Renderer>().material.SetColor("_Color", PrevColor);
@@ -128,25 +128,25 @@ public class TileState : MonoBehaviour
         // The selector entering a tile attempts to add the current tile to the path
         // If it's already in the path, rewinds the path to current tile
 
-        // If already path highlighted, "Rewind" path to current tile
+        // If already path highlighted, "Rewind" path to current tile]
+        Debug.Log("Attempting to add to path: " + Coord);
         if (PathHighlighted)
         {
-            List<TileState> MovePath = Game.MainSelector.MovePath;
+            List<TileState> MovePath = Game.Selector.MovePath;
             TileState Top = MovePath[MovePath.Count - 1];
             while (Top != this && MovePath.Count > 0)
             {
                 Top.PathUnhighlight();
-                Game.MainSelector.UsedMoves -= 1;
+                Game.Selector.UsedMoves -= 1;
                 MovePath.RemoveAt(MovePath.Count - 1);
                 Top = MovePath[MovePath.Count - 1];
             }
-
         }
 
         // If not part of path and there is movement left, attempt ot add to path
         else if (ValidPathTarget())
         {
-            List<TileState> MovePath = Game.MainSelector.MovePath;
+            List<TileState> MovePath = Game.Selector.MovePath;
 
             if (MovePath.Count == 0)
             {
@@ -166,21 +166,21 @@ public class TileState : MonoBehaviour
     public void AddToPath()
     {
         PathHighlight();
-        Game.MainSelector.MovePath.Add(this);
-        Game.MainSelector.UsedMoves += 1;
-        Debug.Log(Game.MainSelector.UsedMoves);
+        Game.Selector.MovePath.Add(this);
+        Game.Selector.UsedMoves += 1;
+        Debug.Log(Game.Selector.UsedMoves);
     }
 
     bool ValidPathTarget()
     {
         return !PathHighlighted
-            && Game.MainSelector.UsedMoves <= Game.MainSelector.SelectedUnit.Movement
+            && Game.Selector.UsedMoves <= Game.Selector.SelectedUnit.Movement
             && CurrentUnit == null;
     }
 
     bool ValidAttackTarget()
     {
-        TileState Top = Game.MainSelector.MovePath[Game.MainSelector.MovePath.Count - 1];
+        TileState Top = Game.Selector.MovePath[Game.Selector.MovePath.Count - 1];
         bool InRange = (Top.Coord - Coord).magnitude == 1;
         return CurrentUnit != null
             && InRange;

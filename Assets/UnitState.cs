@@ -29,10 +29,10 @@ public class UnitState : MonoBehaviour
 
     void OnMouseDown()
     {
-        Game.MainSelector.SelectUnit(this);
+        Game.Selector.SelectUnit(this);
     }
 
-    public void MoveToTile(TileState targetTile)
+    public void WarpToTile(TileState targetTile)
     {
         if (Tile != null)
         {
@@ -43,9 +43,9 @@ public class UnitState : MonoBehaviour
         Tile.CurrentUnit = this;
     }
 
-    public void MoveAlongPath(List<TileState> path, SelectorState endState)
+    public void MoveAlongPath(List<TileState> path, SelectorPhase endState)
     {
-        Game.MainSelector.State = SelectorState.Moving;
+        Game.Selector.State = SelectorPhase.Moving;
 
         Tile.CurrentUnit = null;
         Tile = path[path.Count - 1];
@@ -53,7 +53,7 @@ public class UnitState : MonoBehaviour
         StartCoroutine(MoveAlongPathCoroutine(path, endState));
     }
 
-    IEnumerator MoveAlongPathCoroutine(List<TileState> path, SelectorState endState)
+    IEnumerator MoveAlongPathCoroutine(List<TileState> path, SelectorPhase endState)
     {
         for (int node = 0; node < path.Count; node++)
         {
@@ -66,7 +66,7 @@ public class UnitState : MonoBehaviour
                 yield return null;
             }
         }
-        Game.MainSelector.State = endState;
+        Game.Selector.State = endState;
     }
 
 }

@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum SelectorState {
+public enum SelectorPhase {
     UnitSelection,
     UnitMovementSelection,
     Moving,
@@ -13,7 +13,7 @@ public class Selector : MonoBehaviour
 {
     // Start is called before the first frame update
     public GameController Game;
-    public SelectorState State;
+    public SelectorPhase State;
     public UnitState SelectedUnit;
     public TileState SelectedTile;
 
@@ -25,7 +25,7 @@ public class Selector : MonoBehaviour
     void Start()
     {
         HoverHeight = 0.5f;
-        State = SelectorState.UnitSelection;
+        State = SelectorPhase.UnitSelection;
         MovePath = new List<TileState>();
         UsedMoves = 0;
     }
@@ -44,17 +44,17 @@ public class Selector : MonoBehaviour
 
     public void SelectUnit(UnitState unit)
     {
-        if (State == SelectorState.UnitSelection)
+        if (State == SelectorPhase.UnitSelection)
         {
             if (SelectedUnit != null)
             {
                 DeselectAll();
-                State = SelectorState.UnitSelection;
+                State = SelectorPhase.UnitSelection;
             }
             unit.transform.localScale *= 1.3f;
             SelectedUnit = unit;
             UsedMoves = 0;
-            State = SelectorState.UnitMovementSelection;
+            State = SelectorPhase.UnitMovementSelection;
             unit.Tile.AddToPath();
         }
     }
@@ -68,7 +68,7 @@ public class Selector : MonoBehaviour
 
     public void ClearMovement()
     {
-        foreach (TileState tile in Game.MainSelector.MovePath)
+        foreach (TileState tile in Game.Selector.MovePath)
         {
             tile.PathUnhighlight();
         }
