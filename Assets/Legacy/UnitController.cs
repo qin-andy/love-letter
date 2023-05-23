@@ -9,7 +9,6 @@ public class UnitController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Game = gameObject.GetComponent<GameController>();
     }
 
     public UnitState CreateUnit()

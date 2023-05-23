@@ -19,6 +19,7 @@ public class GameController : MonoBehaviour
     {
         // Place all tiles
         Map = GetComponent<MapController>();
+        Map.Game = this;
         Map.BuildTiles();
 
         CombatController = GetComponent<CombatController>();
@@ -28,6 +29,7 @@ public class GameController : MonoBehaviour
         Selector.Game = this;
 
         UnitController = gameObject.GetComponent<UnitController>();
+        UnitController.Game = this;
 
         UnitState Unit1 = UnitController.CreateUnit();
         UnitState Unit2 = UnitController.CreateUnit();

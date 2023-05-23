@@ -7,11 +7,10 @@ public class MapController : MonoBehaviour
     // Start is called before the first frame update
     public List<TileState> Tiles;
 
-    GameController Game;
+    public GameController Game;
     public GameObject TilePrefab;
     void Start()
     {
-        Game = gameObject.GetComponent<GameController>();
     }
 
     public void BuildTiles()
