@@ -5,14 +5,22 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     public Game Game;
+    public Map Map;
     public GameObject TilePrefab;
     public GameObject UnitPrefab;
-    public TileComponent TileComponent;
+    public UnitManager UnitManager;
     void Start()
     {
         Game = new Game();
-        Game.Map.BuildTiles();
+        Map = Game.Map;
+        Map.BuildTiles();
         RenderTiles();
+
+        UnitManager = gameObject.GetComponent<UnitManager>();
+
+        Unit Unit1 = new Unit();
+        Map.WarpUnitToTile(Unit1, Map.GetRandTile());
+        UnitManager.RenderUnit(Unit1);
     }
 
     void RenderTiles()
@@ -54,6 +62,8 @@ public class Unit
     public float AtkPower;
     public int Movement;
     public Tile HomeTile;
+
+    public UnitComponent UnitComponent;
 }
 
 public class Tile
@@ -114,7 +124,10 @@ public class Map
     // Raw warp to target tile. No checks: Overwrites existing unit.
     public void WarpUnitToTile(Unit unit, Tile targetTile)
     {
-        unit.HomeTile.CurrentUnit = null;
+        if (unit.HomeTile != null)
+        {
+            unit.HomeTile.CurrentUnit = null;
+        }
         unit.HomeTile = targetTile;
         targetTile.CurrentUnit = unit;
     }

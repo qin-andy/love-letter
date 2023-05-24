@@ -6,6 +6,7 @@ public class TileComponent : MonoBehaviour
 {
     // Start is called before the first frame update
     public Tile Tile;
+    public UnitComponent CurrentUnit;
     public bool Hovered;
 
     void Start()
