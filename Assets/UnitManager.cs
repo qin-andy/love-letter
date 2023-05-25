@@ -20,27 +20,27 @@ public class UnitManager : MonoBehaviour
         UnitComponent NewUnitComponent = NewUnitObj.GetComponent<UnitComponent>();
 
         NewUnitComponent.Unit = unit;
-        unit.UnitComponent = NewUnitComponent;
 
         if (unit.HomeTile != null)
         {
-            MoveUnit(NewUnitComponent, unit.HomeTile.TileComponent);
+            TileComponent HomeTileComponent = GameManager.MapManager.GetTileComponent(unit.HomeTile);
+            MoveUnit(NewUnitComponent, HomeTileComponent);
         }
         return NewUnitComponent;
     }
 
     public void MoveUnit(UnitComponent unitComponent, TileComponent dest)
     {
-        float HoverHeight = 0.5f;
+        float HoverHeight = 1f;
         TileComponent Origin = unitComponent.CurrentTile;
         if (Origin != null)
         {
             Origin.CurrentUnit = null;
         }
         dest.CurrentUnit = unitComponent;
+        // unitComponent.transform.SetParent(dest.transform);
         unitComponent.transform.position = dest.transform.position + new Vector3(0f, HoverHeight, 0f);
 
-        unitComponent.transform.SetParent(dest.transform);
-
+        Game.Map.WarpUnitToTile(unitComponent.Unit, dest.Tile);
     }
 }

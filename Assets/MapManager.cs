@@ -32,7 +32,6 @@ public class MapManager : MonoBehaviour
 
             TileComponents.Add(NewTileComponent);
             NewTileComponent.Tile = Tile;
-            Tile.TileComponent = NewTileComponent;
         }
     }
 

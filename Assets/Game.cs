@@ -24,8 +24,6 @@ public class Unit
     public float AtkPower;
     public int Movement;
     public Tile HomeTile;
-
-    public UnitComponent UnitComponent;
 }
 
 public class Tile
@@ -35,7 +33,6 @@ public class Tile
     public Unit CurrentUnit;
 
     public TileOverlay Overlay;
-    public TileComponent TileComponent;
 
     public Tile(Vector2Int Coord)
     {
@@ -92,11 +89,6 @@ public class Map
         unit.HomeTile = targetTile;
         targetTile.CurrentUnit = unit;
     }
-
-    public void RenderTiles()
-    {
-
-    }
 }
 
 public class TileOverlay
@@ -139,7 +131,10 @@ public class MapSelector
 
     public SelectorState State;
 
-    public int SelectionPhase; // Phase of seleciotn, TODO: change type;
+    public MapSelector()
+    {
+        State = SelectorState.SelectingUnit;
+    }
 
     public void SelectTile(Tile tile)
     {

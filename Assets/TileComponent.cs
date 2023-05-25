@@ -22,6 +22,12 @@ public class TileComponent : MonoBehaviour
         SelectorManager.UnhoverTile(this);
     }
 
+    void OnMouseDown()
+    {
+        SelectorManager.SelectTile(this);
+        Debug.Log("Clicked!");
+    }
+
     public void EnableHoverEffect()
     {
         if (!Hovered)
