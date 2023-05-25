@@ -5,23 +5,21 @@ using UnityEngine;
 public class TileComponent : MonoBehaviour
 {
     // Start is called before the first frame update
+    public GameManager GameManager;
+    public MapManager MapManager;
+    public SelectorManager SelectorManager;
     public Tile Tile;
     public UnitComponent CurrentUnit;
     public bool Hovered;
 
-    void Start()
-    {
-        
-    }
-
     void OnMouseEnter()
     {
-        Tile.Overlay.Hover();
+        SelectorManager.HoverTile(this);
     }
 
     void OnMouseExit()
     {
-        Tile.Overlay.Unhover();
+        SelectorManager.UnhoverTile(this);
     }
 
     public void EnableHoverEffect()

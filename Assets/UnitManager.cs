@@ -4,9 +4,15 @@ using UnityEngine;
 
 public class UnitManager : MonoBehaviour
 {
-    public GameObject UnitPrefab;
     public GameManager GameManager;
+    public GameObject UnitPrefab;
     public Game Game;
+
+    void Start()
+    {
+        GameManager = gameObject.GetComponent<GameManager>();
+        Game = GameManager.Game;
+    }
 
     public UnitComponent RenderUnit(Unit unit)
     {
